@@ -1,5 +1,8 @@
 # Fake-signature-generator
 
+## Sample data
+[link](https://drive.google.com/drive/folders/10z1zyav-s2wLv743nT7ggelztIOP3_ra?usp=sharing)
+
 ## Fake signature samples
 ![sample_1](samples/0.png)
 ![sample_2](samples/1.png)
