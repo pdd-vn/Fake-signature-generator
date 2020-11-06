@@ -91,9 +91,9 @@ def gen(ind):
         
         color = random_color_signature()
         signature = augment(signature, color, 
-                              blur_rate=args.blur_rate, 
-                              erosion_kernel_size=args.erosion_kernel_size,
-                              num_eigenvalues=args.num_eigenvalues) * 255
+                            blur_rate=args.blur_rate, 
+                            erosion_kernel_size=args.erosion_kernel_size,
+                            num_eigenvalues=args.num_eigenvalues) * 255
         signature = np.array(signature).astype(np.uint8)
         '''
         Gran_techainer's modification ends
