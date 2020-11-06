@@ -147,15 +147,15 @@ def augment_2(img, color, blur_rate=8, erosion_kernel_size=2, num_eigenvalues=30
     # create eroded image
     erosion = cv2.erode(img, kernel)
 
-    #blur erosion
+    # blur erosion
     blur = iaa.blur.AverageBlur(blur_rate)
     blur_erosion = blur(image=erosion)
     
-    #overide blur erosion 
+    # overide blur erosion 
     override_pos = np.where(img <= blur_erosion)
     blur_erosion[override_pos] = img[override_pos]
     
-    #create clean signature for transparent
+    # create clean signature for transparent
     holder = np.zeros(blur_erosion.shape)
     holder[:] = 255
     holder[sig_pos] = blur_erosion[sig_pos]
