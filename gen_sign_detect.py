@@ -160,15 +160,15 @@ def gen(ind):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Signature Augmentation')
     parser.add_argument('--output_folder', default='./result/', 
-                        type=str, required=False, help='folder path to output datasets')
+                        type=str, required=False, help='folder path to output generated data')
     parser.add_argument('--input_signature', type=str, required=True, 
-                        help='folder path to input signature')
+                        help='folder path to input signatures')
     parser.add_argument('--input_symbol', type=str, required=True, 
                         help='folder path to input other symbols')
     parser.add_argument('--input_stamp', type=str, required=True, 
-                        help='folder path to input other signature')
+                        help='folder path to input stamps')
     parser.add_argument('--input_background', type=str, required=True, 
-                        help='folder path to input background')                   
+                        help='folder path to input backgrounds')                   
     parser.add_argument('--blur_rate', type=int, required=False,
                         help='blur rate in augmentation')
     parser.add_argument('--erosion_kernel_size', type=int, required=False,
@@ -176,9 +176,9 @@ if __name__ == "__main__":
     parser.add_argument('--num_eigenvalues', type=int, required=False,
                         help='number of kept eigenvalues in truncated svd in augmentation')
     parser.add_argument('--num_sample', default= 100, 
-                        type=int, required=False, help='number of image')
+                        type=int, required=False, help='number of images')
     parser.add_argument('--num_workers', default=8, type=int, 
-                        required=False, help='number of core use for multiprocessing')
+                        required=False, help='number of cores use for multiprocessing')
 
     global args
     args = parser.parse_args()
