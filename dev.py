@@ -113,10 +113,18 @@ def augment(img, color, blur_rate=8, erosion_kernel_size=2, num_eigenvalues=30):
     holder[sig_pos] = blur_erosion[sig_pos]
     
     rgb_img = augment_change_color(holder, sig_pos, color)
-    
+
     return rgb_img
 
 def augment_change_color(img, sig_pos, color, enhanced_value=0.8):
+    '''
+    change color of augmented signature.
+    input: - img: signature to change color.
+           - sig_pos: position of signature by pixel.
+           - color: color to be changed to. Available colors are red, blue and black.
+           - enhanced_value: value to be set to enhanced strength of a channel.
+    output: RGB signature.
+    '''
     h, w = img.shape
     rgb_img = np.zeros((h,w,3))
     rgb_img[:,:,0] = img/255
