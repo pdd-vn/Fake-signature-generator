@@ -112,40 +112,29 @@ def augment(img, color, blur_rate=8, erosion_kernel_size=2, num_eigenvalues=30):
     holder[:] = 255
     holder[sig_pos] = blur_erosion[sig_pos]
     
-    rgb = augment_change_color(holder, sig_pos, color)
+    rgb_img = augment_change_color(holder, sig_pos, color)
+    import ipdb; ipdb.set_trace()
+    return rgb_img
 
-    return rgb
-
-def augment_change_color(holder, sig_pos, color):
+def augment_change_color(img, sig_pos, color, enhanced_value=0.8):
+    h, w = img.shape
+    rgb_img = np.zeros((h,w,3))
+    rgb_img[:,:,0] = img/255
+    rgb_img[:,:,1] = img/255
+    rgb_img[:,:,2] = img/255
     if color == "blue":
-        h, w = holder.shape
-        enhanced = holder/255
-        enhanced[sig_pos]=0.8
-        rgb = np.zeros((h,w,3))
-        rgb[:,:,0]=holder/255
-        rgb[:,:,1]=holder/255
-        rgb[:,:,2]=enhanced
-        rgb[rgb<0]=0
+        rgb_img[:,:,2][sig_pos] = enhanced_value
+        rgb_img[rgb_img<0] = 0
     elif color == "red":
-        h, w = holder.shape
-        enhanced = holder/255
-        enhanced[sig_pos]=0.8
-        rgb = np.zeros((h,w,3))
-        rgb[:,:,0]=enhanced
-        rgb[:,:,1]=holder/255
-        rgb[:,:,2]=holder/255
-        rgb[rgb<0]=0
+        rgb_img[:,:,0][sig_pos] = enhanced_value
+        rgb_img[rgb_img<0] = 0
     elif color == "black":
-        h, w = holder.shape
-        rgb = np.zeros((h,w,3))
-        rgb[:,:,0]=holder/255
-        rgb[:,:,1]=holder/255
-        rgb[:,:,2]=holder/255
-        rgb[rgb<0]=0
+        rgb_img[rgb_img<0]=0
     else:
         raise TypeError("Only support blue, red or black color")
 
-    return rgb
+    return rgb_img
+
 
 def show_rgb(img):
     import matplotlib.pyplot as plt
@@ -154,6 +143,7 @@ def show_rgb(img):
     ax.imshow(img)
     plt.show()
 
+
 def show(img):
     import matplotlib.pyplot as plt
     fig = plt.figure()
@@ -161,57 +151,7 @@ def show(img):
     ax.imshow(img, cmap='gray', vmin=0, vmax=255)
     plt.show()
 
-def extract_sig(raw_sig_path):
-    import glob
-    from shutil import copyfile as cp
-
-    for idx,folder in enumerate(glob.glob(raw_sig_path)):
-        try:
-            img_path = glob.glob(folder+"/*")[0]
-            cp(img_path, "./input_signature/sig_{}.png".format(idx))
-        except: 
-            pass
-
-
-def main(args):
-    img_list = []
-    data_path = args.input_signature
-    output_folder = args.output_folder
-    os.makedirs(output_folder, exist_ok=True)
-
-    for folder in os.listdir(data_path):
-        folder_path = os.path.join(data_path, folder)
-        if len(os.listdir(folder_path)) > 2:
-            choosen = random.choices(os.listdir(folder_path), k=2)
-            choosen[0] = os.path.join(folder_path,choosen[0])
-            choosen[1] = os.path.join(folder_path,choosen[1])
-            img_list.append(choosen)
-        elif len(os.listdir(folder_path))==1:
-            choosen = os.path.join(folder_path, os.listdir(folder_path)[0])
-            img_list.append(choosen)
-        else:
-            pass
-    
-    # import ipdb; ipdb.set_trace()
-    img_list = sum(img_list, [])
-
-    for i in tqdm(range(len(img_list))):
-        img = read_gray(img_list[i])
-        img = augment(img, blur_rate=10, erosion_kernel_size=1)
-        out_path = os.path.join(output_folder, "{}.png".format(i))
-        cv2.imwrite(out_path,img)
-
 
 if __name__=="__main__":
-    # import argparse
-    # parser = argparse.ArgumentParser(description='Signature Augmentation')
-    # parser.add_argument("--output_folder", type=str, required=True)
-    # parser.add_argument("--input_signature", type=str, required=True)
-    # parser.add_argument("--svd_kept_feat", type=int, default=30, required=False)
-    # parser.add_argument("--erosion_blur_rate", type=int, default=10, required=False)
-    # parser.add_argument("--erosion_kernel_size", type=int, default=1, required=False)   
-
-    # args = parser.parse_args()
-    # main(args)
-    raw_sig_path = "./raw_sig/*"
-    extract_sig(raw_sig_path)
+    img = read_gray('/home/pdd/Desktop/workspace/sig_gen/Fake-Data-Generator/input_signature/sig_0.png')
+    augment(img, 'blue')
