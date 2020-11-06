@@ -1,0 +1,10 @@
+python gen_sign_detect.py --output_folder="./sign_detect_result" \
+                          --input_signature="./input_signature" \
+                          --input_symbol="./input_symbol" \
+                          --input_stamp="./input_stamp" \
+                          --input_background="./input_background" \
+                          --blur_rate=8 \
+                          --erosion_kernel_size=2 \
+                          --num_eigenvalues=30 \
+                          --num_sample=1 \
+                          --num_workers=8
