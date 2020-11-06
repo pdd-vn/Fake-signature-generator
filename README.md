@@ -6,5 +6,5 @@
 
 ## Signature generating how to
 * Prepare your input background, signature, stamp and symbol in 4 separated folder at root directory.
-* Prepare your generating script at "script/". 
+* Prepare your generating script at `script/`. Sample script has already been prepared for your convenience.
 * Run  `sh script/gen_sign_detect.sh` to start generating data.
