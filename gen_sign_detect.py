@@ -13,7 +13,7 @@ import utils
 from tqdm import tqdm
 import time
 
-from dev import augment_2, read_gray
+from dev import augment, read_gray
 
 
 def random_color_signature():
@@ -78,6 +78,9 @@ def gen(ind):
     old_crd_signs = []
     # Fill signature to background
     for i in range(num_signs):
+        '''
+        Gran_techainer's modification starts
+        '''
         signature = read_gray(random.choice(list_signs))
         sign_h, sign_w = signature.shape
         ratio_size = random.uniform(0.1, 0.25)
@@ -87,11 +90,14 @@ def gen(ind):
         signature = cv2.resize(signature,(new_sign_w, new_sign_h))
         
         color = random_color_signature()
-        signature = augment_2(signature, color, 
+        signature = augment(signature, color, 
                               blur_rate=args.blur_rate, 
                               erosion_kernel_size=args.erosion_kernel_size,
                               num_eigenvalues=args.num_eigenvalues) * 255
         signature = np.array(signature).astype(np.uint8)
+        '''
+        Gran_techainer's modification ends
+        '''
 
         signature = Image.fromarray(signature).convert("RGB")
 

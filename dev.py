@@ -75,55 +75,7 @@ def svd(img, k):
     return np.dot(u[:,:k],np.dot(np.diag(s[:k]),v[:k,:]))
 
 
-# def augment_1(img, blur_rate=10, erosion_kernel_size=2):
-#     '''
-#     but het muc
-#     '''
-#     #import ipdb; ipdb.set_trace()
-#     img = psuedo_binary_img(img)
-    
-#     #create erosion
-#     kernel_size = erosion_kernel_size
-#     kernel = np.ones((kernel_size, kernel_size), np.uint8)
-#     erosion = cv2.erode(img, kernel)
-    
-#     #get sig position by pixel
-#     sig_pos = []
-#     h, w = erosion.shape
-#     for i in range(h):
-#         for j in range(w):
-#             if erosion[i][j]==0:
-#                 sig_pos.append((i,j))
-
-#     #drop img information w/ svd
-#     img = svd(img, 30)
-
-#     #blur erosion
-#     blur = iaa.blur.AverageBlur(blur_rate)
-#     blur_erosion = blur(image=erosion)
-    
-#     #overide blur erosion 
-#     h,w = img.shape
-#     for i in range(h):
-#         for j in range(w):
-#             if img[i][j] != 255:
-#                 if img[i][j] <= blur_erosion[i][j]:
-#                     blur_erosion[i][j] = img[i][j]
-    
-#     #create clean sig for transparent
-#     holder = np.zeros(blur_erosion.shape)
-#     h, w = holder.shape
-#     for i in range(h):
-#         for j in range(w):
-#             holder[i][j] = 255
-
-#     for i in range(len(sig_pos)):
-#         holder[sig_pos[i][0]][sig_pos[i][1]] = blur_erosion[sig_pos[i][0]][sig_pos[i][1]]
-
-#     return holder
-
-
-def augment_2(img, color, blur_rate=8, erosion_kernel_size=2, num_eigenvalues=30):
+def augment(img, color, blur_rate=8, erosion_kernel_size=2, num_eigenvalues=30):
     '''
     but nhoe muc
     '''
@@ -160,11 +112,11 @@ def augment_2(img, color, blur_rate=8, erosion_kernel_size=2, num_eigenvalues=30
     holder[:] = 255
     holder[sig_pos] = blur_erosion[sig_pos]
     
-    rgb = augment_2_change_color(holder, sig_pos, color)
+    rgb = augment_change_color(holder, sig_pos, color)
 
     return rgb
 
-def augment_2_change_color(holder, sig_pos, color):
+def augment_change_color(holder, sig_pos, color):
     if color == "blue":
         h, w = holder.shape
         enhanced = holder/255
@@ -245,7 +197,7 @@ def main(args):
 
     for i in tqdm(range(len(img_list))):
         img = read_gray(img_list[i])
-        img = augment_2(img, blur_rate=10, erosion_kernel_size=1)
+        img = augment(img, blur_rate=10, erosion_kernel_size=1)
         out_path = os.path.join(output_folder, "{}.png".format(i))
         cv2.imwrite(out_path,img)
 
