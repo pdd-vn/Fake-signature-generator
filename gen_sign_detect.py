@@ -151,27 +151,6 @@ def gen(ind):
         f.writelines(label_yolo)
 
 
-def main(args):
-    os.makedirs(args.output_folder,exist_ok=True)
-    
-    global list_symbols
-    global list_signs
-    global list_stamps
-    global list_bgs
-    global STAMP
-    STAMP = 0
-
-    list_symbols = glob.glob(os.path.join(args.input_symbol, "*"))
-    list_signs = glob.glob(os.path.join(args.input_signature,"*"))
-    list_stamps = glob.glob(os.path.join(args.input_stamp, "*"))
-    list_bgs = glob.glob(os.path.join(args.input_background, "*"))
-
-    pool = multiprocessing.Pool(args.num_workers)
-    output = list(tqdm(
-        pool.imap(gen, range(args.num_sample)), total=args.num_sample, desc="Augmenting"))
-    pool.terminate()
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Signature Augmentation')
     parser.add_argument('--output_folder', default='./result/', 
