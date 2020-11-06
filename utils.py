@@ -103,12 +103,14 @@ def overlay_huge_transparent(background:PIL.Image, foreground:PIL.Image, color=N
 
     return background
 
+
 def PIL_to_gray(img:PIL.Image):
     temp = np.array(img)
     if np.mean(2*temp[:,:,0]-temp[:,:,1]-temp[:,:,2]) != 0:
         raise Exception("Input is not 'gray' enough... IT IS NOT GRAY AT ALL!!!")
     else:
         return temp[:,:,0]
+
 
 def overlay_transparent(background:PIL.Image, foreground:PIL.Image, coordinate=None, remove_bg=False, color=None):
     ''' Overlay transparent image on background
@@ -241,6 +243,7 @@ def tlwh_2_yolo_format(bbox, bg_shape):
     height = np.round((h/bg_h), 6)
     return (x_center, y_center, width, height)
 
+
 def gen_signature(ind):
     path = sign_images[ind]
     image = Image.open(path)
@@ -252,11 +255,13 @@ def gen_signature(ind):
     image = create_transparent_image(image, threshold=220)
     image.save(os.path.join("input_signature", "{}.png".format(ind)))
 
+
 def gen_stamp(ind):
     path = stamp_images[ind]
     image = Image.open(path)
     image = create_transparent_image(image, threshold=220)
     image.save(os.path.join("input_stamp", "{}.png".format(ind)))
+
 
 def collect_signature(path="/home/pdd/Downloads/Generated_data/Generated_data"):
     from shutil import copyfile
@@ -271,6 +276,7 @@ def collect_signature(path="/home/pdd/Downloads/Generated_data/Generated_data"):
         temp += 1
         copyfile(choosen[1], "/home/pdd/Desktop/sandbox/Fake-Data-Generator/data/signature_collection/{}.png".format(temp))
         temp += 1
+
 
 if __name__ == "__main__":
     from tqdm import tqdm
