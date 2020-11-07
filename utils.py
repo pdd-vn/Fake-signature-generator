@@ -5,6 +5,7 @@ from PIL import Image, ImageFont, ImageFont
 import PIL
 import random
 
+
 def tlwh_to_polygon(left, top, width, height):
     '''Convert bounding box (left, top, width, height) to polygon 4 point
     '''
@@ -278,22 +279,3 @@ def collect_signature(path="/home/pdd/Downloads/Generated_data/Generated_data"):
         temp += 1
 
 
-if __name__ == "__main__":
-    from tqdm import tqdm
-    import glob
-    import multiprocessing
-    global sign_images
-    sign_images = glob.glob(os.path.join("data", "signature_collection", "*"))
-    # for ind, path in tqdm(enumerate(sign_images), total=len(sign_images)):
-    pool = multiprocessing.Pool(8)
-    output = list(tqdm(
-        pool.imap(gen_signature, range(len(sign_images))), total=len(sign_images), desc="Augmenting"))
-    pool.terminate()
-    pass        
-
-    # stamp_images = glob.glob(os.path.join("data", "stamp_collection", "*"))
-    # pool = multiprocessing.Pool(8)
-    # output = list(tqdm(
-    #     pool.imap(gen_stamp, range(len(stamp_images))), total=len(stamp_images), desc="Augmenting"))
-    # pool.terminate()
-    # #collect_signature()
