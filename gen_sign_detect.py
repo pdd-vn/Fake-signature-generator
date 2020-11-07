@@ -15,7 +15,9 @@ import time
 
 from dev import augment, read_gray
 
-
+'''
+Gran_techainer's modification starts.
+'''
 def random_color_signature():
     p_color = random.uniform(0,1)
     if p_color < 0.5:
@@ -25,7 +27,9 @@ def random_color_signature():
     else:
         color = 'black'
     return color
-
+'''
+Gran_techainer's modification ends.
+'''
 
 def random_coordinate(bg_shape, im_shape):
     bg_w, bg_h = bg_shape
@@ -79,7 +83,7 @@ def gen(ind):
     # Fill signature to background
     for i in range(num_signs):
         '''
-        Gran_techainer's modification starts
+        Gran_techainer's modification starts.
         '''
         signature = read_gray(random.choice(list_signs))
         sign_h, sign_w = signature.shape
@@ -96,7 +100,7 @@ def gen(ind):
                             num_eigenvalues=args.num_eigenvalues) * 255
         signature = np.array(signature).astype(np.uint8)
         '''
-        Gran_techainer's modification ends
+        Gran_techainer's modification ends.
         '''
 
         signature = Image.fromarray(signature).convert("RGB")
