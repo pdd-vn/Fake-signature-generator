@@ -13,31 +13,24 @@ def read_gray(path):
     input: image path.
     output: gray image in cv2 format.
     '''
-    img = cv2.imread(path)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    return gray
+    img = cv2.imread(path, 0)
+    return img
 
 
 def psuedo_binary_img(img, threshold=200):
     '''
     create binary image in gray scale format.
-    input: 2D image.
-    output: 2D image which only take 0 or 255 value.
+    input: gray image.
+    output: gray image which only take 0 or 255 value.
     '''
-    h, w = img.shape
-    for i in range(h):
-        for j in range(w):
-            if img[i][j]<threshold:
-                img[i][j]=0
-            else:
-                img[i][j]=255
-    return img
+    _, thresh = cv2.threshold(img, threshold, 255, cv2.THRESH_BINARY)
+    return thresh
 
 
 def hrz_border(img):
     '''
     get horizontal border.
-    input: 2D image.
+    input: gray image.
     output: upper and lower border of input.
     '''
     h, w = img.shape
@@ -55,7 +48,7 @@ def hrz_border(img):
 def crop_border(img):
     '''
     crop image from its border.
-    input: 2D image.
+    input: gray image.
     output: cropped image.
     '''
     upper, lower = hrz_border(img)
@@ -75,46 +68,55 @@ def svd(img, k):
     return np.dot(u[:,:k],np.dot(np.diag(s[:k]),v[:k,:]))
 
 
-def augment(img, color, blur_rate=8, erosion_kernel_size=2, num_eigenvalues=30):
+def create_thick_blur_sig(img, blur_kernel_size, erosion_kernel_size):
     '''
-    but nhoe muc
+    input: - img: signature gray image.
+           - blur_kernel_size: cv2.blur ksize.
+           - erosion_kernel_size: cv2.erode kernel size.
+    output: thick blur signature image.
     '''
-    # read image
-    img = np.array(img)
+    kernel = np.ones((erosion_kernel_size, erosion_kernel_size), np.uint8)
+    erosion = cv2.erode(img, kernel)
+    thick_blur_sig = cv2.blur(erosion, (blur_kernel_size, blur_kernel_size))
+
+    return thick_blur_sig
+
+
+def augment_sig(img, blur_kernel_size=8, erosion_kernel_size=2, num_eigenvalues=30):
+    '''
+    create real signature with white background for transparent.
+    input: - img: gray img.
+           - blur_kernel_size: cv2.blur ksize.
+           - erosion_kernel_size: cv2.erode kernel size.
+    output: signature with shadow for more realistic. 
+    '''
+    # force gray image to contain only 0 and 255 value, aka psuedo binary image
     img = psuedo_binary_img(img)
 
-    # create blur erosion
-    kernel_size = erosion_kernel_size
-    kernel = np.ones((kernel_size, kernel_size), np.uint8)
-    erosion = cv2.erode(img, kernel)
-    blur = iaa.blur.AverageBlur(blur_rate)
-    blur_erosion = blur(image=erosion)
-    
-    # get signature position by pixel
-    sig_pos = np.where(blur_erosion != 255)
+    # create shadow and get whole signature position by pixel using shadow
+    shadow = create_thick_blur_sig(img, blur_kernel_size, erosion_kernel_size)
+    sig_pos = np.where(shadow != 255)
 
     # drop image information using svd
-    img = svd(img, num_eigenvalues)
+    truncated_img = svd(img, num_eigenvalues)
 
-    # create eroded image
-    erosion = cv2.erode(img, kernel)
-
-    # blur erosion
-    blur = iaa.blur.AverageBlur(blur_rate)
-    blur_erosion = blur(image=erosion)
+    # create shadow for truncated signature
+    truncated_shadow = create_thick_blur_sig(truncated_img,
+                                            blur_kernel_size,
+                                            erosion_kernel_size)
     
-    # overide blur erosion 
-    override_pos = np.where(img <= blur_erosion)
-    blur_erosion[override_pos] = img[override_pos]
+    # overide shadow
+    overwrite_pos = np.where(truncated_img <= truncated_shadow)
+    truncated_shadow[overwrite_pos] = truncated_img[overwrite_pos]
     
     # create clean signature for transparent
-    holder = np.zeros(blur_erosion.shape)
-    holder[:] = 255
-    holder[sig_pos] = blur_erosion[sig_pos]
+    clean_sig = np.zeros(img.shape)
+    clean_sig[:] = 255
+    clean_sig[sig_pos] = truncated_shadow[sig_pos]
     
-    rgb_img = augment_change_color(holder, sig_pos, color)
-    
-    return rgb_img
+    return clean_sig
+
+
 
 def augment_change_color(img, sig_pos, color, enhanced_value=0.8):
     '''
@@ -125,16 +127,17 @@ def augment_change_color(img, sig_pos, color, enhanced_value=0.8):
            - enhanced_value: value to be set to enhanced strength of a channel.
     output: RGB signature.
     '''
-    h, w = img.shape
-    rgb_img = np.zeros((h,w,3))
-    rgb_img[:,:,0] = img/255
-    rgb_img[:,:,1] = img/255
-    rgb_img[:,:,2] = img/255
+    # h, w = img.shape
+    # rgb_img = np.zeros((h,w,3))
+    # rgb_img[:,:,0] = img/255
+    # rgb_img[:,:,1] = img/255
+    # rgb_img[:,:,2] = img/255
+    rgb_img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
     if color == "blue":
-        rgb_img[:,:,2][sig_pos] = enhanced_value
+        rgb_img[:,:,2][sig_pos] = enhanced_value * 255
         rgb_img[rgb_img<0] = 0
     elif color == "red":
-        rgb_img[:,:,0][sig_pos] = enhanced_value
+        rgb_img[:,:,0][sig_pos] = enhanced_value * 255
         rgb_img[rgb_img<0] = 0
     elif color == "black":
         rgb_img[rgb_img<0]=0
@@ -162,4 +165,4 @@ def show(img):
 
 if __name__=="__main__":
     img = read_gray('/home/pdd/Desktop/workspace/sig_gen/Fake-Data-Generator/input_signature/sig_0.png')
-    augment(img, 'blue')
+    import ipdb; ipdb.set_trace()
